@@ -6,20 +6,19 @@ import { FindAllDto } from "./dto/find-all-dto";
 export class TaskRepository extends Repository<Task>{
 
     async getTasks(filterDto: FindAllDto): Promise<Task[]> {
-
         const { status, search } = filterDto;
         const query = this.createQueryBuilder('task');
 
-        if(status){
+        if (status) {
             query.andWhere('task.status = :status', { status });
         }
 
-        if(search){
-            query.andWhere('(task.title LIKE :search OR task.description LIKE :search)', {search: `%${search}%`})
+        if (search) {
+            query.andWhere('(task.title LIKE :search OR task.description LIKE :search)', { search: `%${search}%` })
         }
- 
+
         const tasks = await query.getMany();
         return tasks;
-      }
-      
+    }
+
 }
