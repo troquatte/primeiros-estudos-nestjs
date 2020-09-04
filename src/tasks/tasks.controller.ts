@@ -1,4 +1,5 @@
-import { Controller, Get, Body, Post, Param, Delete, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Body, Post, Param, Delete, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { TasksService } from './tasks.service';
 import { TaskStatus } from "./tasks-status.enum";
 import { CreateTasksDto } from './dto/create-tasks.dto';
@@ -7,29 +8,30 @@ import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
 import { Task } from './tasks.entity';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
-    constructor(private tasksService: TasksService){}
+    constructor(private tasksService: TasksService) { }
 
     @Get()
-    public async allTasks(@Query(ValidationPipe) findAllDto: FindAllDto): Promise<Task[]>{
+    public async allTasks(@Query(ValidationPipe) findAllDto: FindAllDto): Promise<Task[]> {
         return await this.tasksService.allTasks(findAllDto);
     }
 
     @Get("/:id")
-    public getTaskId(@Param('id', ParseIntPipe) id: number):Promise<Task>{
+    public getTaskId(@Param('id', ParseIntPipe) id: number): Promise<Task> {
         return this.tasksService.getTaskId(id);
     }
 
     @Post()
     @UsePipes(ValidationPipe)
     public createTasks(
-        @Body() createTasksDto: CreateTasksDto 
-    ): Promise<Task>{
+        @Body() createTasksDto: CreateTasksDto
+    ): Promise<Task> {
         return this.tasksService.createTasks(createTasksDto);
     }
 
     @Delete("/:id")
-    public deleteTasks(@Param('id', ParseIntPipe) id: number): Promise<void>{
+    public deleteTasks(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.tasksService.deleteTasks(id);
     }
 
@@ -37,7 +39,7 @@ export class TasksController {
     public updateTasks(
         @Param('id', ParseIntPipe) id: number,
         @Body('status', TaskStatusValidationPipe) status: TaskStatus
-    ): Promise<Task>{
+    ): Promise<Task> {
         return this.tasksService.updateTasks(id, status)
     }
 }
